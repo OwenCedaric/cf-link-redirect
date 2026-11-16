@@ -1,0 +1,22 @@
+{
+  "name": "cf-link-redirect",
+  "version": "1.0.0",
+  "description": "High-performance social media link redirect and analytics on Cloudflare Workers",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "node --experimental-strip-types test/app.test.mjs",
+    "build": "tsc --noEmit",
+    "generate-wrangler": "node scripts/generate-wrangler.mjs",
+    "deploy": "npm run generate-wrangler && wrangler deploy"
+  },
+  "dependencies": {
+    "hono": "^4.7.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261116.1",
+    "typescript": "^5.7.3",
+    "wrangler": "^4.162.0"
+  }
+}

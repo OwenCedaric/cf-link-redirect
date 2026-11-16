@@ -1,0 +1,21 @@
+name = "{{WORKER_NAME}}"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Cloudflare KV for storing short link configurations
+[[kv_namespaces]]
+binding = "LINKS_KV"
+id = "{{KV_NAMESPACE_ID}}"
+
+# Optional Analytics Engine Dataset for event logging
+# {{ANALYTICS_CONFIG}}
+
+# Optional Custom Domain Routing
+# {{ROUTES_CONFIG}}
+
+# Environment Variables
+[vars]
+ADMIN_TOKEN = "{{ADMIN_TOKEN}}"
+DEFAULT_FALLBACK_URL = "{{DEFAULT_FALLBACK_URL}}"
+SITE_NAME = "{{SITE_NAME}}"
