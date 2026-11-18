@@ -4,7 +4,11 @@
 
 - ⚡ **极致低延迟**：302 重定向由 Cloudflare 遍布全球的边缘节点直接响应，KV 内存级缓存查找，跳转体感延迟仅数毫秒。
 - 🤖 **社媒卡片优化**：智能识别 Twitterbot、TelegramBot、Facebook 等爬虫，针对性返回 OpenGraph 预览卡片 HTML，避免社媒分享链接时卡片空白。
-- 📊 **异步无感打点**：使用 `ctx.waitUntil` 将地理位置（国家/城市）、设备类型、来源 Referer 异步写入 Analytics Engine 与 KV 计数器，打点完全不阻塞跳转。
+- 📊 **多维度来源分析**：支持提取 Referrer 域名与 `utm_source`/`ref` 营销标签，统计来源渠道（直接访问、X/Twitter、微信等）、访客国家/城市与设备分布。
+- 🔗 **统计信息绑定与同步清理**：访问统计数据直接绑定在短链配置中，删除短链时关联的统计信息自动彻底销毁，不留孤儿数据。
+- 🎲 **随机后缀与临时短链**：提供一键随机生成无歧义短链后缀（如 `r8n4kq`），支持快速转换临时短链。
+- ⏳ **定期跳转与到期 404**：支持设定链接有效期（1小时、24小时、7天、30天或自定义），到期后跳转自动失效并返回 404。
+- 🚫 **严密 404 兜底**：对于已被删除或未配置的短链地址，点击后统一返回 404 页面，避免意外重定向。
 - 🔒 **Header Rewrite 鉴权**：支持基于 Surge 等客户端的 `[Header Rewrite]` 模块自动注入 `Authorization: Bearer <ADMIN_TOKEN>`，管理员访问后台无感免登，外界访问自动拦截。
 - 🚀 **GitOps 自动化部署**：通过 GitHub Actions 自动化部署，`wrangler.toml` 由 Action 结合 GitHub Secrets/Variables **动态生成**，代码库零配置泄露。
 
@@ -25,8 +29,9 @@
 │   │   ├── admin.ts          # 管理后台 API、控制台页面与 .sgmodule 动态下载
 │   │   └── redirect.ts       # 核心 302 跳转、UTM 透传、爬虫检测与异步打点
 │   ├── templates/
-│   │   ├── admin.html.ts     # 管理后台 Web UI (Tailwind CSS)
-│   │   └── unauthorized.html.ts # 401 权限说明与 Surge 模块指引页
+│   │   ├── admin.ts          # 管理后台 Web UI (Chronicle 设计系统)
+│   │   ├── notfound.ts       # 404 页面模板 (已失效/已删除/不存在短链展示)
+│   │   └── unauthorized.ts   # 401 权限说明与 Surge 模块指引页
 │   └── utils/
 │       ├── bot.ts            # 社交平台爬虫识别与 OpenGraph 卡片渲染
 │       ├── device.ts         # User-Agent 解析与 Referer 提取
@@ -84,21 +89,22 @@
 
 ### 使用 Surge 模块自动注入（无感访问）
 
-1. 部署完成后，访问 `https://<你的域名>/auth.sgmodule`，即可获取当前域名定制的 Surge 模块。
+1. 部署完成后，在浏览器访问控制台未授权页面，点击「一键导入 Surge 模块」直接调起客户端安装，或访问 `https://<你的域名>/auth.sgmodule` 下载当前域名定制的 Surge 模块。
 2. 模块内容格式如下：
    ```ini
-   #!name=Link Redirect Auth
-   #!desc=自动注入管理后台与 API 验证所需的 Authorization Header
-   #!arguments=Auth:鉴权Token
+   #!name=Link Redirect Auth (<你的域名>)
+   #!desc=自动注入管理后台与 API 验证所需的 Authorization Header，实现管理员无感免密直连
+   #!arguments=Auth:鉴权Token(ADMIN_TOKEN)
+   #!system=macOS,iOS
 
    [Header Rewrite]
-   ^https?://<你的域名>/(admin|api) header-add Authorization "Bearer {{{Auth}}}"
+   ^https?://<你的域名>(/(admin|api)($|[/?].*)|/?($|\?.*)) header-add Authorization "Bearer {{{Auth}}}"
 
    [MITM]
    hostname = %APPEND% <你的域名>
    ```
 3. 在 Surge 中导入该模块，并在参数中填入之前设置的 `ADMIN_TOKEN`。
-4. 打开 Safari 或 Chrome 直接访问 `https://<你的域名>/admin`，Surge 将在网络层自动补齐 Header，**无需输入密码即可直接进入控制台**！
+4. 打开 Safari 或 Chrome 直接访问 `https://<你的域名>/admin` 或 `https://<你的域名>/`，Surge 将在网络层自动补齐 Header，**无需手动输入口令验证即可直接进入控制台**！若未授权页面已打开，完成 Surge 注入后页面将自动检测并秒级直入。
 
 ---
 

@@ -20,3 +20,17 @@ export function mergeQueryParams(targetUrl: string, requestUrl: string): string 
     return targetUrl;
   }
 }
+
+/**
+ * Generates a clean, readable random slug (lowercase alphanumeric, unambiguous characters).
+ */
+export function generateRandomSlug(length: number = 6): string {
+  const chars = '23456789abcdefghjkmnpqrstuvwxyz';
+  let result = '';
+  const bytes = new Uint8Array(length);
+  crypto.getRandomValues(bytes);
+  for (let i = 0; i < length; i++) {
+    result += chars[bytes[i] % chars.length];
+  }
+  return result;
+}

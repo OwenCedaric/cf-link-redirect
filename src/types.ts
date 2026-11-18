@@ -6,6 +6,20 @@ export interface Env {
   SITE_NAME: string;
 }
 
+export interface LinkStatsData {
+  totalClicks: number;
+  referrers: Record<string, number>;
+  countries: Record<string, number>;
+  devices: Record<string, number>;
+  recentClicks: Array<{
+    timestamp: number;
+    country: string;
+    city: string;
+    device: string;
+    referer: string;
+  }>;
+}
+
 export interface LinkItem {
   slug: string;
   url: string;
@@ -15,7 +29,9 @@ export interface LinkItem {
   enabled: boolean;
   createdAt: number;
   updatedAt: number;
+  expiresAt?: number | null; // Scheduled / expired timestamp in ms (null/undefined = permanent)
   clicks?: number;
+  stats?: LinkStatsData;
 }
 
 export interface ClickRecord {
@@ -39,4 +55,7 @@ export interface LinkStats {
     device: string;
     referer: string;
   }>;
+  referrers?: Record<string, number>;
+  countries?: Record<string, number>;
+  devices?: Record<string, number>;
 }

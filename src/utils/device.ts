@@ -18,14 +18,28 @@ export function parseDevice(userAgent: string | null): string {
 }
 
 /**
- * Extracts friendly referrer domain or category.
+ * Extracts friendly referrer domain or UTM source.
  */
-export function parseReferer(referer: string | null): string {
-  if (!referer) return 'Direct';
-  try {
-    const url = new URL(referer);
-    return url.hostname.replace(/^www\./, '');
-  } catch {
-    return 'Unknown';
+export function parseReferer(referer: string | null, requestUrl?: string): string {
+  if (referer) {
+    try {
+      const url = new URL(referer);
+      return url.hostname.replace(/^www\./, '');
+    } catch {
+      return 'Unknown';
+    }
   }
+
+  // If no referer, check UTM or referral params in incoming requestUrl
+  if (requestUrl) {
+    try {
+      const u = new URL(requestUrl);
+      const utmSource = u.searchParams.get('utm_source') || u.searchParams.get('source') || u.searchParams.get('ref');
+      if (utmSource) {
+        return `UTM: ${utmSource.slice(0, 30)}`;
+      }
+    } catch {}
+  }
+
+  return 'Direct';
 }

@@ -52,6 +52,9 @@ export function renderOpenGraphHtml(link: LinkItem, targetUrl: string, siteName:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title} - ${escapeHtml(siteName)}</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.ico">
   
   <!-- Open Graph / Facebook / Discord / Telegram -->
   <meta property="og:type" content="website" />
